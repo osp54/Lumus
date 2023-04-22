@@ -4,8 +4,8 @@ on: [push, workflow_dispatch]
 
 jobs:
   buildJar:
+    permissions: write-all
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - run: chmod +x gradlew
