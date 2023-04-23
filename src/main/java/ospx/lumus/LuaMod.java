@@ -2,14 +2,12 @@ package ospx.lumus;
 
 import arc.files.Fi;
 import arc.util.CommandHandler;
-import arc.util.Log;
 import arc.util.Strings;
 import party.iroiro.luajava.Lua;
 import party.iroiro.luajava.luajit.LuaJit;
 import party.iroiro.luajava.value.LuaValue;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import static ospx.lumus.Utils.handleErrors;
 
 public class LuaMod {
     public Fi root;
@@ -41,28 +39,10 @@ public class LuaMod {
             callFunction("configure", config);
         }
 
-        handleErrors();
+        handleError();
     }
-    public void handleErrors() {
-        handleErrors(lastStatus);
-    }
-    public void handleErrors(Lua.LuaError status) {
-        if (status == Lua.LuaError.OK) return;
-
-        if (context.getTop() != 0 && context.isString(-1)) {
-            Log.err("An exception occurred while loading the mod @\n@", root.name(), context.toString(-1));
-        }
-        context.setTop(0);
-        Throwable e = context.getJavaError();
-        if (e != null) {
-            Log.err("Last Java side exception:");
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            PrintStream print = new PrintStream(output);
-            e.printStackTrace(print);
-            print.flush();
-            Log.err(output.toString());
-            context.error((Throwable) null);
-        }
+    public void handleError() {
+        handleErrors(context, lastStatus, root.name());
     }
 
     public void registerServerCommands(CommandHandler handler) {

@@ -10,12 +10,16 @@ import arc.util.Log;
 import arc.util.Time;
 import mindustry.mod.*;
 import party.iroiro.luajava.Lua;
+import party.iroiro.luajava.luajit.LuaJit;
 
 import static mindustry.Vars.dataDirectory;
+import static mindustry.Vars.modDirectory;
 
 public class Main extends Plugin {
     public static Seq<LuaMod> mods = new Seq<>();
     public static Fi MODS_DIRECTORY = dataDirectory.child("luamods");
+
+    public static Lua mainLua;
 
     public Main() {
         Core.app.addListener(new ApplicationListener() {
@@ -31,8 +35,19 @@ public class Main extends Plugin {
                 mods.each(LuaMod::close);
             }
         });
-
         MODS_DIRECTORY.mkdirs();
+
+        Time.mark();
+        try {
+            mainLua = new LuaJit();
+            LuaGlobals.init(mainLua);
+        } catch (LinkageError e) {
+            Log.err(e);
+            Log.err("LuaJIT not loaded. Exiting");
+            Core.app.exit();
+        }
+
+        Log.info("Time to load luajit: @", Time.elapsed());
 
         Seq<Fi> dirs = Seq.with(MODS_DIRECTORY.list()).filter(d -> d.isDirectory() && d.child("main.lua").exists());
         for (Fi dir : dirs) {
@@ -59,6 +74,24 @@ public class Main extends Plugin {
 
     @Override
     public void registerServerCommands(CommandHandler handler) {
+        handler.register("luamods", "List lua mods", (args) -> {
+            if (!mods.isEmpty()) {
+                Log.info("Lua Mods:");
+                for (LuaMod mod : mods) {
+                    Log.info("  @ @ Status: @", mod.config.meta.name, mod.config.meta.version, mod.lastStatus);
+                }
+            } else {
+                Log.info("No mods found.");
+            }
+
+            Log.info("Mod directory: @", modDirectory.absolutePath());
+        });
+
+        handler.register("lua", "<code...>", "Execute lua code", (args) -> {
+            Lua.LuaError status = mainLua.run(args[0]);
+            Utils.handleErrors(mainLua, status, "console.lua");
+        });
+
         modEach(m -> m.registerServerCommands(handler));
     }
 

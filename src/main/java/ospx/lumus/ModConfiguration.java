@@ -1,12 +1,17 @@
 package ospx.lumus;
 
-import arc.func.Cons;
+import arc.Events;
+import arc.func.*;
 import arc.struct.Seq;
 import arc.util.CommandHandler;
+import arc.util.Log;
+import mindustry.game.EventType;
 import mindustry.gen.Player;
+import party.iroiro.luajava.LuaException;
+
 @SuppressWarnings("unused")
 public class ModConfiguration {
-    public String name = "Unknown", description = "Unknown", version = "1.0";
+    public ModMetadata meta = new ModMetadata();
 
     public Runnable onExit = () -> {};
     public Runnable onDispose = () -> {};
@@ -19,36 +24,40 @@ public class ModConfiguration {
         clientCommands.add(new Command(text, params, description, runner));
     }
 
+    public void registerClientCommand(String text, String params, String description,
+                                      Boolf2<String[], Player> middleware,
+                                      CommandHandler.CommandRunner<Player> runner) {
+        registerClientCommand(text, params, description, (args, player) -> {
+            if (middleware.get(args, player)) {
+                runner.accept(args, player);
+            }
+        });
+    }
+
     public void registerServerCommand(String text, String params, String description, Cons<String[]> runner) {
         serverCommands.add(new Command(text, params, description, (args, p) -> runner.get(args)));
     }
 
+    public void registerServerCommand(String text, String params, String description, Boolf<String[]> middleware, Cons<String[]> runner) {
+        registerServerCommand(text, params, description, (args) -> {
+            if (middleware.get(args)) runner.get(args);
+        });
+    }
+
+    public <T> void registerEventListener(String eventName, Cons<T> listener) {
+        Class<T> type = Utils.getSubclassByName(EventType.class, eventName);
+
+        if (type == null) throw new LuaException("EventType by name '" + eventName +"' not found");
+        Log.info(type.getSimpleName());
+
+        Events.on(type, listener);
+    }
+
+    public <T> void registerEventListener(Class<T> type, Cons<T> listener) {
+        Events.on(type, listener);
+    }
+
     public ModConfiguration() {}
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
 
     public Runnable getOnExit() {
         return onExit;

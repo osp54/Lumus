@@ -3,6 +3,7 @@ package ospx.lumus;
 import arc.Core;
 import arc.Events;
 import arc.util.Log;
+import arc.util.Time;
 import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
@@ -25,7 +26,7 @@ public class LuaGlobals {
     private static final Class<?>[] pushClasses = {
             Log.class, Items.class, Blocks.class, Block.class, Liquids.class, UnitTypes.class, Vars.class, Core.class,
             Call.class, Events.class, EventType.class, Stats.class, ConsumeLiquidFilter.class, Wall.class, Category.class,
-            ItemStack.class, BuildVisibility.class, ItemTurret.class, BasicBulletType.class
+            ItemStack.class, BuildVisibility.class, ItemTurret.class, BasicBulletType.class, Time.class
     };
     public static void init(Lua lua) {
         for (Class<?> clazz : pushClasses) {
