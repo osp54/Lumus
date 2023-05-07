@@ -2,6 +2,7 @@ package ospx.lumus;
 
 import arc.files.Fi;
 import arc.util.CommandHandler;
+import arc.util.Log;
 import arc.util.Strings;
 import party.iroiro.luajava.Lua;
 import party.iroiro.luajava.luajit.LuaJit;
@@ -48,6 +49,21 @@ public class LuaMod {
     public void registerServerCommands(CommandHandler handler) {
         for (Command command : config.serverCommands) {
             handler.register(command.text, command.params, command.description, command.runner);
+        }
+
+        if (!config.meta.name.equals("Unknown") && config.modInfoCommand) {
+            handler.register(config.meta.name, "Plugin " + config.meta.displayName, args -> {
+                Log.info("@ @", config.meta.displayName, config.meta.version);
+                Log.info(config.meta.description);
+                Log.info("Server Commands:");
+                for (Command command : config.serverCommands) {
+                    Log.info("  @ @ @", command.text, command.params, command.description);
+                }
+                Log.info("Client Commands:");
+                for (Command command : config.clientCommands) {
+                    Log.info("  @ @ @", command.text, command.params, command.description);
+                }
+            });
         }
     }
     public void registerClientCommands(CommandHandler handler) {

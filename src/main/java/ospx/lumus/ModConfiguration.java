@@ -12,6 +12,7 @@ import party.iroiro.luajava.LuaException;
 @SuppressWarnings("unused")
 public class ModConfiguration {
     public ModMetadata meta = new ModMetadata();
+    public boolean modInfoCommand = true;
 
     public Runnable onExit = () -> {};
     public Runnable onDispose = () -> {};
@@ -58,6 +59,10 @@ public class ModConfiguration {
     }
 
     public ModConfiguration() {}
+
+    public void setModInfoCommand(boolean modInfoCommand) {
+        this.modInfoCommand = modInfoCommand;
+    }
 
     public Runnable getOnExit() {
         return onExit;

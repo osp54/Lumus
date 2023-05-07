@@ -2,7 +2,7 @@ package ospx.lumus;
 
 @SuppressWarnings("unused")
 public class ModMetadata {
-    public String name = "Unknown", description = "Unknown", version = "1.0";
+    public String name = "Unknown", displayName = "Unknown", description = "Unknown", version = "1.0";
 
     public ModMetadata() {}
 
@@ -12,6 +12,13 @@ public class ModMetadata {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getDescription() {
