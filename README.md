@@ -5,15 +5,14 @@ Lumus is a Mindustry plugin that loads Lua plugins.
 
 Contents
 --------
-
-*   [Install the Plugin](#install-the-plugin)
-    
-*   [Installing Lua Plugins](#installing-lua-plugins)
-    
+*   Usage
+	*   [Install the Plugin](#install-the-plugin)
+	*   [Installing Lua Plugins](#installing-lua-plugins)
 *   [Developer Guide](#developer-guide)
-    
     *   [Configuring](#configuring)
     *   [Registering Commands](#registering-commands)
+	    *  [Commands Middleware](#commands-middleware)
+    *   [Listening Events](#listening-events)
 
 ### Install The Plugin
 
@@ -59,7 +58,7 @@ Explanation of the configuration options:
 
 ### Registering Commands
 
-To register commands, add the following code to the [configure](#configuring) in your `main.lua` file:
+To register commands, add the following code to the [configure](#configuring):
 
 **Client Command**
 
@@ -78,3 +77,49 @@ end)
 ```
 
 These commands demonstrate how to register client and server commands. The example client command sends a "Hello!" message to the player, while the example server command logs "Hello!" using the Log module.
+
+### Commands middleware
+Commands middleware is a function that is executed before a command and returns a boolean value. If the value is  true, the execution of the command continues. Otherwise, the command is ignored.
+
+Add following code to [configure](#configuring):
+**Simple command for pre-check for admin**
+```lua
+config:registerClientCommand("admin-command", "", "Admin Command",  isAdmin, function (this, args, player)
+	player:sendMessage("You are admin!")
+end)
+
+function isAdmin(this, args, player)
+	return player.admin;
+end
+```
+**Simple command for pre-check for server status**
+```lua
+config:registerServerCommand("kill-all", "", "Kill all units", serverIsHosting, function (this, args)
+	Groups.unit:each(function (this, unit) unit:kill() end)
+	Log:info("Success")
+end)
+
+function serverIsHosting(this, args)
+	return not Vars.state:isMenu()
+end
+```
+These examples demonstrate how to use commands middleware to perform pre-checks before executing a command. The `isAdmin` function checks if the player is an admin before executing the "admin-command" client command. The `serverIsHosting` function checks if the server is not in the menu state before executing the "kill-all" server command.
+
+### Listening events
+There are two ways to listening to events
+
+**First**:
+```lua
+Events:on(PlayerJoinEvent, function (this, event) 
+	event.player:sendMessage("Welcome to our server!")
+end)
+```
+This is a more raw way of listening to events using the internal Mindustry Java API.
+**Second**:
+In [configure](#configuring), add the following code:
+```lua
+config:registerEventListener("player-join-event", function (this, event)
+	event.player:sendMessage("Welcome to our server!")
+end)
+```
+This is a more Lua-like way of listening to events, where the event name is in kebab case.
