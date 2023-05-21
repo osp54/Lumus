@@ -9,9 +9,11 @@ import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.content.Liquids;
 import mindustry.content.UnitTypes;
+import mindustry.core.GameState;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
+import mindustry.gen.Groups;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.world.Block;
@@ -25,7 +27,7 @@ import party.iroiro.luajava.Lua;
 public class LuaGlobals {
     private static final Class<?>[] pushClasses = {
             Log.class, Items.class, Blocks.class, Block.class, Liquids.class, UnitTypes.class, Vars.class, Core.class,
-            Call.class, Events.class, EventType.class, Stats.class, ConsumeLiquidFilter.class, Wall.class, Category.class,
+            Call.class, Events.class, GameState.class, Groups.class, EventType.class, Stats.class, ConsumeLiquidFilter.class, Wall.class, Category.class,
             ItemStack.class, BuildVisibility.class, ItemTurret.class, BasicBulletType.class, Time.class
     };
     public static void init(Lua lua) {

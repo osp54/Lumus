@@ -17,14 +17,14 @@ repositories {
 
 ext {
     // The build number that this mod is made for
-    mindustryVersion = 'v143'
+    mindustryVersion = 'v144'
     jabelVersion = "93fde537c7"
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
 }
 
 toxopid {
-    compileVersion.set("v143")
-    runtimeVersion.set("v143")
+    compileVersion.set("v144")
+    runtimeVersion.set("v144")
     platforms.add(ModPlatform.HEADLESS)
 }
 

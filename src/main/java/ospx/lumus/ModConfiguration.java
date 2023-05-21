@@ -5,6 +5,8 @@ import arc.func.*;
 import arc.struct.Seq;
 import arc.util.CommandHandler;
 import arc.util.Log;
+import mindustry.Vars;
+import mindustry.core.GameState;
 import mindustry.game.EventType;
 import mindustry.gen.Player;
 import party.iroiro.luajava.LuaException;
@@ -49,7 +51,6 @@ public class ModConfiguration {
         Class<T> type = Utils.getSubclassByName(EventType.class, eventName);
 
         if (type == null) throw new LuaException("EventType by name '" + eventName +"' not found");
-        Log.info(type.getSimpleName());
 
         Events.on(type, listener);
     }
