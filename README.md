@@ -13,6 +13,8 @@ Contents
     *   [Registering Commands](#registering-commands)
 	    *  [Commands Middleware](#commands-middleware)
     *   [Listening Events](#listening-events)
+    *   [Special Events](#special-events)
+    *   [Examples](#examples)
 
 ### Install The Plugin
 
@@ -58,7 +60,7 @@ Explanation of the configuration options:
 
 ### Registering Commands
 
-To register commands, add the following code to the [configure](#configuring):
+To register commands, add the following code to the [configure](#configuring) function:
 
 **Client Command**
 
@@ -81,7 +83,7 @@ These commands demonstrate how to register client and server commands. The examp
 ### Commands middleware
 Commands middleware is a function that is executed before a command and returns a boolean value. If the value is  true, the execution of the command continues. Otherwise, the command is ignored.
 
-Add following code to [configure](#configuring):
+Add following code to [configure](#configuring) function:
 **Simple command for pre-check for admin**
 ```lua
 config:registerClientCommand("admin-command", "", "Admin Command",  isAdmin, function (this, args, player)
@@ -110,16 +112,49 @@ There are two ways to listening to events
 
 **First**:
 ```lua
-Events:on(PlayerJoinEvent, function (this, event) 
+Events:on(PlayerJoin, function (this, event) 
 	event.player:sendMessage("Welcome to our server!")
 end)
 ```
 This is a more raw way of listening to events using the internal Mindustry Java API.
 **Second**:
-In [configure](#configuring), add the following code:
+In [configure](#configuring) function, add the following code:
 ```lua
-config:registerEventListener("player-join-event", function (this, event)
+config:registerEventListener("player-join", function (this, event)
 	event.player:sendMessage("Welcome to our server!")
 end)
 ```
 This is a more Lua-like way of listening to events, where the event name is in kebab case.
+
+You can discover a comprehensive list of accessible events by visiting the following link: [here](https://github.com/Anuken/Mindustry/blob/master/core/src/mindustry/game/EventType.java)
+### Special events
+
+The following special events can be used in your plugin:
+
+* `onInit`: Called after all plugins have been created and commands have been registered.
+* `onExit`: Called when the application exits gracefully, either through Core.app:exit(). It is not called after a crash, unlike onDispose().
+* `onDispose`: Called when the Application is destroyed.
+
+**Using**
+In [configure](#configuring) function, add the following code:
+onInit:
+```lua
+config:setOnInit(function() 
+    -- do something
+end)
+```
+onExit:
+```lua
+config:setOnExit(function()
+    -- do something
+end)
+```
+onDispose:
+```lua
+config:setOnDispose(function()
+    -- do something
+end)
+```
+
+### Examples
+Examples of lua plugins can be found [here](https://github.com/osp54/Lumus/tree/master/examples)
