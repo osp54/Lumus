@@ -15,6 +15,7 @@ Contents
     *   [Listening Events](#listening-events)
     *   [Special Events](#special-events)
     *   [Examples](#examples)
+    *   [VSCode Autocomplete](#vscode-autocomplete)
 
 ### Install The Plugin
 
@@ -155,6 +156,23 @@ config:setOnDispose(function()
     -- do something
 end)
 ```
+
+### VSCode Autocomplete
+To enable VSCode Autocomplete for the Lumus API, simply follow these straightforward steps:
+
+1. Start by installing the [lua-language-server](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) extension in VSCode
+2. Next, locate the `definitions` directory in this repository and copy it to a location of your choice on your machine
+3. Open the `.vscode/settings.json` file in your project or create it if it doesn't exist.
+4. Within the settings.json file, add the following configuration:
+    ```json
+    {
+        "Lua.workspace.library": [
+            "%definitions-directory%"
+        ]
+    }
+    ```
+    Make sure to replace %definitions-directory% with the actual path to the directory where you copied the definitions folder from our repository.
+4. That's it! You have successfully enabled VSCode Autocomplete for the Lumus API. Enjoy coding with enhanced assistance and productivity.
 
 ### Examples
 Examples of lua plugins can be found [here](https://github.com/osp54/Lumus/tree/master/examples)
