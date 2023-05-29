@@ -26,7 +26,7 @@ public class LuaMod {
         context = new LuaJit();
         context.openLibraries();
 
-        LuaGlobals.init(context);
+        new LuaGlobals(context).init();
         context.push(root.absolutePath());
         context.setGlobal("__dir");
 
@@ -35,6 +35,7 @@ public class LuaMod {
 
         context.run(Strings.format("package.path = '@/?.lua;' .. package.path\n", root.absolutePath()));
         lastStatus = context.run(file.readString());
+
 
         if (lastStatus == Lua.LuaError.OK) {
             callFunction("configure", config);

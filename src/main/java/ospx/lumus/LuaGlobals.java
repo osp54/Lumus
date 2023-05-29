@@ -7,41 +7,66 @@ import arc.util.Time;
 import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
-import mindustry.content.Liquids;
 import mindustry.content.UnitTypes;
 import mindustry.core.GameState;
-import mindustry.entities.bullet.BasicBulletType;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.type.Category;
-import mindustry.type.ItemStack;
 import mindustry.world.Block;
-import mindustry.world.blocks.defense.Wall;
-import mindustry.world.blocks.defense.turrets.ItemTurret;
-import mindustry.world.consumers.ConsumeLiquidFilter;
-import mindustry.world.meta.BuildVisibility;
-import mindustry.world.meta.Stats;
+import party.iroiro.luajava.JFunction;
 import party.iroiro.luajava.Lua;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LuaGlobals {
-    private static final Class<?>[] pushClasses = {
-            Log.class, Items.class, Blocks.class, Block.class, Liquids.class, UnitTypes.class, Vars.class, Core.class,
-            Call.class, Events.class, GameState.class, Groups.class, EventType.class, Stats.class, ConsumeLiquidFilter.class, Wall.class, Category.class,
-            ItemStack.class, BuildVisibility.class, ItemTurret.class, BasicBulletType.class, Time.class
+    private static final Class<?>[] MINDUSTRY_CLASSES = {
+            Log.class, Items.class, Blocks.class, Block.class, UnitTypes.class, Vars.class, Core.class,
+            Call.class, Events.class, GameState.class, Groups.class, EventType.class, Category.class,
+            Time.class
     };
-    public static void init(Lua lua) {
-        for (Class<?> clazz : pushClasses) {
-            pushClass(lua, clazz);
+    private final Lua context;
+    private List<String> packagesToImport = new ArrayList<>();
+
+    public LuaGlobals(Lua context) {
+        this.context = context;
+    }
+    public void init() {
+        for (Class<?> clazz : MINDUSTRY_CLASSES) {
+            pushClass(clazz);
         }
 
         for (Class<?> clazz : EventType.class.getClasses()) {
-            pushClass(lua, clazz);
+            pushClass(clazz);
         }
+
+        pushFunction("importPackage", l -> {
+            for (int i = 1; i <= l.getTop(); i++) {
+                packagesToImport.add(l.toString(i));
+            }
+            l.pushNil();
+            return 1;
+        });
+
+        pushFunction("doImport", l -> {
+            long start = Time.millis();
+            for (Class<?> clazz : Utils.getClassesInPackages(packagesToImport.toArray(new String[0]))) {
+                pushClass(clazz);
+            }
+            Log.debug("Imported packages in @ms, @", Time.millis() - start, packagesToImport);
+            packagesToImport.clear();
+            return 1;
+        });
     }
 
-    public static void pushClass(Lua lua, Class<?> clazz) {
-        lua.pushJavaClass(clazz);
-        lua.setGlobal(clazz.getSimpleName());
+    public void pushClass(Class<?> clazz) {
+        context.pushJavaClass(clazz);
+        context.setGlobal(clazz.getSimpleName());
+    }
+
+    public void pushFunction(String name, JFunction func) {
+        context.push(func);
+        context.setGlobal(name);
     }
 }

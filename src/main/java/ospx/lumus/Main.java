@@ -40,7 +40,7 @@ public class Main extends Plugin {
         Time.mark();
         try {
             mainLua = new LuaJit();
-            LuaGlobals.init(mainLua);
+            new LuaGlobals(mainLua).init();
         } catch (LinkageError e) {
             Log.err(e);
             Log.err("LuaJIT not loaded. Exiting");

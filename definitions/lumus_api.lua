@@ -1,5 +1,13 @@
 ---@meta
 
+---Adds packages to a list for import \
+---@see doImport
+---@param ... string packages
+function importPackage(...)  end
+
+---Imports all the packages requested through importPackage
+function doImport()  end
+
 ---@class meta
 ---@field name string
 ---@field displayName string
