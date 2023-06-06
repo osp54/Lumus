@@ -1,7 +1,7 @@
 displayName: "Lumus"
 name: "lumus-mod"
 author: "OSPx"
-main: "ospx.lumus.Main"
+main: "ospx.lumus.Lumus"
 description: "The mindustry plugin that loads plugins on lua"
 version: 0.8
 minGameVersion: 143

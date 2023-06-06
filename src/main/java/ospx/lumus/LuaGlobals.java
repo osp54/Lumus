@@ -2,6 +2,8 @@ package ospx.lumus;
 
 import arc.Core;
 import arc.Events;
+import arc.func.Cons;
+import arc.util.CommandHandler;
 import arc.util.Log;
 import arc.util.Time;
 import mindustry.Vars;
@@ -28,18 +30,45 @@ public class LuaGlobals {
     };
     private final Lua context;
     private List<String> packagesToImport = new ArrayList<>();
+    private ModConfiguration config;
 
     public LuaGlobals(Lua context) {
         this.context = context;
     }
-    public void init() {
-        for (Class<?> clazz : MINDUSTRY_CLASSES) {
-            pushClass(clazz);
-        }
+    public LuaGlobals(Lua context, ModConfiguration config) {
+        this.context = context;
+        this.config = config;
+    }
 
-        for (Class<?> clazz : EventType.class.getClasses()) {
-            pushClass(clazz);
-        }
+    public void pushAll() {
+        pushStandardClasses();
+
+        context.push(l -> LumusLuaAPI.pluginConfiguration(l, config));
+        context.setGlobal("pluginConfiguration");
+
+        context.createTable(0, 2);
+        context.push(l -> LumusLuaAPI.command(l, Command.CommandType.CLIENT));
+        context.setField(-2, "clientCommand");
+
+        context.push(l -> LumusLuaAPI.command(l, Command.CommandType.SERVER));
+        context.setField(-2, "serverCommand");
+        context.setGlobal("commands");
+
+        context.createTable(0, 4);
+
+        context.push(LumusLuaAPI::event);
+        context.setField(-2, "eventListener");
+
+        context.push(l -> LumusLuaAPI.setOnInit(l, config));
+        context.setField(-2, "onInit");
+
+        context.push(l -> LumusLuaAPI.setOnExit(l, config));
+        context.setField(-2, "onExit");
+
+        context.push(l -> LumusLuaAPI.setOnDispose(l, config));
+        context.setField(-2, "onDispose");
+
+        context.setGlobal("events");
 
         pushFunction("importPackage", l -> {
             for (int i = 1; i <= l.getTop(); i++) {
@@ -58,6 +87,15 @@ public class LuaGlobals {
             packagesToImport.clear();
             return 1;
         });
+    }
+    public void pushStandardClasses() {
+        for (Class<?> clazz : MINDUSTRY_CLASSES) {
+            pushClass(clazz);
+        }
+
+        for (Class<?> clazz : EventType.class.getClasses()) {
+            pushClass(clazz);
+        }
     }
 
     public void pushClass(Class<?> clazz) {

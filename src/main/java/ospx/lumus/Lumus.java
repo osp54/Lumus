@@ -15,13 +15,18 @@ import party.iroiro.luajava.luajit.LuaJit;
 import static mindustry.Vars.dataDirectory;
 import static mindustry.Vars.modDirectory;
 
-public class Main extends Plugin {
+public class Lumus extends Plugin {
     public static Seq<LuaMod> mods = new Seq<>();
     public static Fi MODS_DIRECTORY = dataDirectory.child("luamods");
 
     public static Lua mainLua;
 
-    public Main() {
+    public static Seq<Command> clientCommands = new Seq<>();
+    public static Seq<Command> serverCommands = new Seq<>();
+
+    public static boolean commandsRegistered = false;
+
+    public Lumus() {
         Core.app.addListener(new ApplicationListener() {
             @Override
             public void exit() {
@@ -40,7 +45,7 @@ public class Main extends Plugin {
         Time.mark();
         try {
             mainLua = new LuaJit();
-            new LuaGlobals(mainLua).init();
+            new LuaGlobals(mainLua).pushStandardClasses();
         } catch (LinkageError e) {
             Log.err(e);
             Log.err("LuaJIT not loaded. Exiting");
@@ -92,11 +97,13 @@ public class Main extends Plugin {
             Utils.handleErrors(mainLua, status, "console.lua");
         });
 
-        modEach(m -> m.registerServerCommands(handler));
+        serverCommands.each(c -> handler.register(c.text, c.params, c.description, c.runner));
+        commandsRegistered = true;
     }
 
     @Override
     public void registerClientCommands(CommandHandler handler) {
-        modEach(m -> m.registerClientCommands(handler));
+        clientCommands.each(c -> handler.register(c.text, c.params, c.description, c.runner));
+        commandsRegistered = true;
     }
 }

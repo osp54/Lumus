@@ -44,39 +44,46 @@ To start developing your own plugin, follow these steps:
 In your `main.lua` file, add the following code:
 
 ```lua
-configure = function (config)
-    config.meta:setDisplayName("Example Plugin")
-    config.meta:setName("example-plugin")
-    config.meta:setVersion("1.0")
-    config.meta:setDescription("Example plugin")
-end
+pluginConfiguration {
+    meta = {
+        displayName = "Example Plugin",
+        name = "example-plugin",
+        version = "1.0",
+        description = "Example plugin"
+    }
+}
 ```
 
 Explanation of the configuration options:
 
-*   `config.meta`: Provides metadata about the plugin.
-*   `config.meta:setDisplayName(str)`: Sets the display name of the plugin, which is used in the `luamods` console command.
-*   `config.meta:setName(str)`: Sets the internal name of the plugin, used for interaction with other plugins.
-*   `config.meta:setDescription(str)`: Sets the description of the plugin, which is used in the `%plugin_name%` command.
+*   `meta`: Provides metadata about the plugin.
+*   `displayName(str)`: Sets the display name of the plugin, which is used in the `luamods` console command.
+*   `name(str)`: Sets the internal name of the plugin, used for interaction with other plugins.
+*   `description(str)`: Sets the description of the plugin.
 
 ### Registering Commands
-
-To register commands, add the following code to the [configure](#configuring) function:
 
 **Client Command**
 
 ```lua
-config:registerClientCommand("example-client-command", "", "Example client command", function (this, args, player)
-    player:sendMessage("Hello!")
-end)
-
+commands.clientCommand {
+    name = "example-client-command",
+    description = "Example client command",
+    handler = function(self, args, player)
+        player:sendMessage("Hello!")
+    end
+}
 ```
 
 **Server Command**
 ```lua
-config:registerServerCommand("example-server-command", "", "Example server command", function (this, args)
-    Log:info("Hello!")
-end)
+commands.clientCommand {
+    name = "example-server-command",
+    description = "Example server command",
+    handler = function(self, args, player)
+        Log:info("Hello!")
+    end
+}
 ```
 
 These commands demonstrate how to register client and server commands. The example client command sends a "Hello!" message to the player, while the example server command logs "Hello!" using the Log module.
@@ -84,12 +91,16 @@ These commands demonstrate how to register client and server commands. The examp
 ### Commands middleware
 Commands middleware is a function that is executed before a command and returns a boolean value. If the value is  true, the execution of the command continues. Otherwise, the command is ignored.
 
-Add following code to [configure](#configuring) function:
 **Simple command for pre-check for admin**
 ```lua
-config:registerClientCommand("admin-command", "", "Admin Command",  isAdmin, function (this, args, player)
-	player:sendMessage("You are admin!")
-end)
+commands.clientCommand {
+    name = "admin-command",
+    description = "Admin Command",
+    middleware = isAdmin,
+    handler = function(self, args, player)
+        player:sendMessage("You are admin!")
+    end
+}
 
 function isAdmin(this, args, player)
 	return player.admin;
@@ -97,6 +108,15 @@ end
 ```
 **Simple command for pre-check for server status**
 ```lua
+commands.serverCommand {
+    name = "kill-all",
+    description = "Kill all units",
+    middleware = serverIsHosting,
+    handler = function(self, args)
+        Groups.unit:each(function (this, unit) unit:kill() end)
+        Log:info("Success")
+    end
+}
 config:registerServerCommand("kill-all", "", "Kill all units", serverIsHosting, function (this, args)
 	Groups.unit:each(function (this, unit) unit:kill() end)
 	Log:info("Success")
@@ -121,8 +141,8 @@ This is a more raw way of listening to events using the internal Mindustry Java 
 **Second**:
 In [configure](#configuring) function, add the following code:
 ```lua
-config:registerEventListener("player-join", function (this, event)
-	event.player:sendMessage("Welcome to our server!")
+events.eventListener("player-join", function(self, event)
+    event.player:sendMessage("Welcome to our server!")
 end)
 ```
 This is a more Lua-like way of listening to events, where the event name is in kebab case.
@@ -140,19 +160,19 @@ The following special events can be used in your plugin:
 In [configure](#configuring) function, add the following code:
 onInit:
 ```lua
-config:setOnInit(function() 
+events.onInit(function() 
     -- do something
 end)
 ```
 onExit:
 ```lua
-config:setOnExit(function()
+events.onExit(function()
     -- do something
 end)
 ```
 onDispose:
 ```lua
-config:setOnDispose(function()
+events.onDispose(function()
     -- do something
 end)
 ```
