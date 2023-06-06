@@ -77,7 +77,7 @@ commands.clientCommand {
 
 **Server Command**
 ```lua
-commands.clientCommand {
+commands.serverCommand {
     name = "example-server-command",
     description = "Example server command",
     handler = function(self, args, player)
