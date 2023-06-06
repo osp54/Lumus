@@ -139,7 +139,6 @@ end)
 ```
 This is a more raw way of listening to events using the internal Mindustry Java API.
 **Second**:
-In [configure](#configuring) function, add the following code:
 ```lua
 events.eventListener("player-join", function(self, event)
     event.player:sendMessage("Welcome to our server!")
@@ -157,7 +156,6 @@ The following special events can be used in your plugin:
 * `onDispose`: Called when the Application is destroyed.
 
 **Using**
-In [configure](#configuring) function, add the following code:
 onInit:
 ```lua
 events.onInit(function() 
